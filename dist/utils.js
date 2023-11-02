@@ -4,9 +4,6 @@ export const getNumber = (texto) => {
     let n = Number(input(texto));
     while (isNaN(n)) {
         n = getNumber(texto);
-        while (isNaN(n)) {
-            n = getNumber(texto);
-        }
     }
     return n;
 };

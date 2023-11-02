@@ -7,10 +7,6 @@ export const getNumber = (texto: string) => {
 
     while (isNaN(n)) {
         n = getNumber(texto);
-
-        while (isNaN(n)) {
-            n = getNumber(texto)
-        }
     }
 
     return n
