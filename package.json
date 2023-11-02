@@ -1,0 +1,20 @@
+{
+  "name": "redesocial",
+  "version": "1.0.0",
+  "description": "prova de poo 2023.2",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/readline-sync": "^1.4.6",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "install": "^0.13.0",
+    "readline-sync": "^1.4.10"
+  }
+}
