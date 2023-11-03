@@ -24,4 +24,8 @@ export class Perfil {
   get email() {
     return this._email;
   }
+
+  incluir(postagem: Postagem): void {
+    this._postagens.push(postagem);
+  }
 }

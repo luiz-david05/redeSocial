@@ -20,4 +20,7 @@ export class Perfil {
     get email() {
         return this._email;
     }
+    incluir(postagem) {
+        this._postagens.push(postagem);
+    }
 }
