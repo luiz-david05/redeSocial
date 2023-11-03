@@ -5,11 +5,16 @@ import { PostagemAvancada } from "../basicas/PostagemAvancada.js";
 export class RepositorioDePostagens {
   private _postagens: Postagem[] = [];
 
-  incluir(postagem: Postagem, perfil: Perfil) {
-    this._postagens.push(postagem);
-    perfil.postagens.push(postagem)
+  get postagens() {
+    return this._postagens
   }
 
+  incluir(postagem: Postagem) {
+    this._postagens.push(postagem);
+    postagem.perfil.incluir(postagem)
+  }
+
+  // ver amanhã
   consultar(
     id: number | null,
     texto: string | null,
@@ -25,7 +30,7 @@ export class RepositorioDePostagens {
       }
       if (
         hashtag !== null &&
-        !(postagem instanceof PostagemAvancada && postagem.hashtags.includes(hashtag))
+        !(postagem instanceof PostagemAvancada && postagem.existeHashtag(hashtag))
       ) {
         return false;
       }
