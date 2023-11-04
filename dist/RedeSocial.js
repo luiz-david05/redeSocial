@@ -34,6 +34,7 @@ export class RedeSocial {
     }
     incluirPostagem(postagem) {
         if (this.postagemEhValida(postagem)) {
+            this._repositorioPostagens.incluir(postagem);
         }
     }
     postagemEhValida(postagem) {
@@ -70,52 +71,66 @@ export class RedeSocial {
             postagem.diminuirVisualizacoes();
         }
     }
-    exibirPostagensPerfil(id) {
-        let perfil = this._repositorioPerfis.consultar(id, null, null);
-        for (let postagem of perfil.postagens) {
-            if (postagem instanceof PostagemAvancada) {
-                if (postagem.visualizacoesRestantes > 1) {
-                    this.decrementarVisualizacoes(postagem);
+    PostagemPorPerfil(idPerfil) {
+        const perfil = this.consultarPerfil(idPerfil, null, null);
+        const postagensPerfil = [];
+        if (perfil !== null) {
+            for (const postagem of perfil.postagens) {
+                if (postagem instanceof PostagemAvancada &&
+                    postagem.podeSerExibida()) {
+                    if (postagem.visualizacoesRestantes > 1) {
+                        this.decrementarVisualizacoes(postagem);
+                    }
                 }
+                postagensPerfil.push(postagem);
             }
         }
-        return perfil.postagens;
+        return postagensPerfil;
     }
-    exibirPostagensPorHashtag(hashtag) {
-        let postagens = this._repositorioPostagens.consultar(null, null, hashtag, null);
-        const postagensFiltradas = [];
-        for (let postagem of postagens) {
-            if (postagem instanceof PostagemAvancada) {
-                if (postagem.visualizacoesRestantes > 1) {
-                    this.decrementarVisualizacoes(postagem);
-                    postagensFiltradas.push(postagem);
+    exibirPostagensPorPerfil(idPerfil) {
+        const postagensPerfil = this.PostagemPorPerfil(idPerfil);
+        if (postagensPerfil.length > 0) {
+            console.log(`\nPostagens do user: `);
+            for (const postagem of postagensPerfil) {
+                console.log(this.toStringPostagem(postagem));
+            }
+        }
+    }
+    postagemPorHashtag(hashtag) {
+        const postagensAlvo = this.consultarPostagem(null, null, hashtag, null);
+        if (postagensAlvo.length > 0) {
+            for (let postagem of postagensAlvo) {
+                if (postagem instanceof PostagemAvancada && postagem.podeSerExibida()) {
+                    if (postagem.visualizacoesRestantes > 1) {
+                        this.decrementarVisualizacoes(postagem);
+                    }
                 }
             }
         }
-        return postagensFiltradas;
+        return postagensAlvo;
     }
     formatarData(data) {
         const dia = data.getDate().toString().padStart(2, "0");
         const mes = (data.getMonth() + 1).toString().padStart(2, "0");
         const ano = data.getFullYear();
-        const hora = data.getHours();
-        const minuto = data.getMinutes();
-        return `${dia}/${mes}/${ano}: ${hora}/${minuto}`;
+        return `${dia}/${mes}/${ano}`;
     }
     toStringPostagem(postagem) {
-        return `\n${postagem.perfil.nome} em ${this.formatarData(postagem.data)}:\n${postagem.texto}\n curtidas ${postagem.curtidas}, ${postagem.descurtidas}`;
+        let texto = `user: ${postagem.perfil.nome} em ${this.formatarData(postagem.data)}:\n"${postagem.texto}"\ncurtidas ${postagem.curtidas}, descurtidas ${postagem.descurtidas}`;
+        if (postagem instanceof PostagemAvancada) {
+            texto += `\nHashtags: ${postagem.hashtags}` +
+                `\nVisualizações restantes: ${postagem.visualizacoesRestantes}`;
+        }
+        return texto;
     }
 }
-// teste
-let facetruco = new RedeSocial();
-let perfil = new Perfil(1, 'luiz', 'ti@.com');
-let perfil2 = new Perfil(2, 'maconha', 'cannabis@.com');
-facetruco.incluirPerfil(perfil);
-facetruco.incluirPerfil(perfil2);
-console.log(facetruco.repositorioPerfis.perfis);
-let postagem = new Postagem(1, 'bostil: tanke-o ou deixe-o', 0, 0, new Date(), perfil);
-let postagem2 = new Postagem(2, 'bostil: tanke-o ou deixe-o', 0, 0, new Date(), perfil2);
-console.log();
-facetruco.incluirPostagem(postagem);
-facetruco.incluirPostagem(postagem2);
-console.log(facetruco.exibirPostagensPerfil(perfil.id));
+let faceboque = new RedeSocial();
+faceboque.incluirPerfil(new Perfil(1, 'zezin do gas', 'zezin@hotmail.com'));
+faceboque.incluirPerfil(new Perfil(2, 'zezin do gas2', 'zezin2@hotmail.com'));
+faceboque.incluirPerfil(new Perfil(3, 'zezin do gas3', 'zezin3@hotmail.com'));
+faceboque.incluirPostagem(new Postagem(1, 'Taticas de guerrilha, vol 1', 100, 500, new Date(), faceboque.consultarPerfil(1, null, null)));
+let postagem = new PostagemAvancada(4, '2050 homens ?', 10, 0, new Date(), faceboque.consultarPerfil(3, null, null), ['#carlinhos', '#mamei2050']);
+faceboque.incluirPostagem(postagem);
+faceboque.exibirPostagensPorPerfil(1);
+faceboque.exibirPostagensPorPerfil(2);
+faceboque.exibirPostagensPorPerfil(3);

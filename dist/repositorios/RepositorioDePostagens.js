@@ -8,7 +8,6 @@ export class RepositorioDePostagens {
         this._postagens.push(postagem);
         postagem.perfil.incluir(postagem);
     }
-    // ver amanhã
     consultar(id, texto, hashtag, perfil) {
         return this._postagens.filter((postagem) => {
             if (id !== null && postagem.id !== id) {

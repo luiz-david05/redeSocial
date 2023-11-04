@@ -14,7 +14,6 @@ export class RepositorioDePostagens {
     postagem.perfil.incluir(postagem)
   }
 
-  // ver amanhã
   consultar(
     id: number | null,
     texto: string | null,

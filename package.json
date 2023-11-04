@@ -11,10 +11,12 @@
   "license": "ISC",
   "devDependencies": {
     "@types/readline-sync": "^1.4.6",
+    "@types/uuid": "^9.0.6",
     "typescript": "^5.2.2"
   },
   "dependencies": {
     "install": "^0.13.0",
-    "readline-sync": "^1.4.10"
+    "readline-sync": "^1.4.10",
+    "uuid": "^9.0.1"
   }
 }

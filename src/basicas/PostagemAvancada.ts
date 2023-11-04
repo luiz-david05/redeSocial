@@ -9,11 +9,11 @@ export class PostagemAvancada extends Postagem {
     descurtidas: number,
     data: Date,
     perfil: Perfil,
+    private _hashtags: string[] = []
   ) {
     super(id, texto, curtidas, descurtidas, data, perfil);
   }
 
-  private _hashtags: string[] = [];
   private _visualizacoesRestantes = 1000
 
   get hashtags(): string[] {
@@ -39,5 +39,9 @@ export class PostagemAvancada extends Postagem {
 
   diminuirVisualizacoes() {
     this._visualizacoesRestantes--;
+  }
+
+  podeSerExibida(): boolean {
+    return this._visualizacoesRestantes > 0;
   }
 }

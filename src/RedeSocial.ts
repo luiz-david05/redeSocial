@@ -6,7 +6,8 @@ import { PostagemAvancada } from "./basicas/PostagemAvancada.js";
 
 export class RedeSocial {
   private _repositorioPerfis: RepositorioDePerfis = new RepositorioDePerfis();
-  private _repositorioPostagens: RepositorioDePostagens = new RepositorioDePostagens();
+  private _repositorioPostagens: RepositorioDePostagens =
+    new RepositorioDePostagens();
 
   // teste
 
@@ -24,9 +25,13 @@ export class RedeSocial {
       // Verifica se já existe um perfil com o mesmo id
       if (this.repositorioPerfis.consultar(perfil.id, null, null) === null) {
         // Verifica se já existe um perfil com o mesmo nome
-        if (this.repositorioPerfis.consultar(null, perfil.nome, null) === null) {
+        if (
+          this.repositorioPerfis.consultar(null, perfil.nome, null) === null
+        ) {
           // Verifica se já existe um perfil com o mesmo email
-          if (this.repositorioPerfis.consultar(null, null, perfil.email) === null) {
+          if (
+            this.repositorioPerfis.consultar(null, null, perfil.email) === null
+          ) {
             // Se todos os testes passarem, inclui o perfil
             this.repositorioPerfis.incluir(perfil);
           }
@@ -34,41 +39,39 @@ export class RedeSocial {
       }
     }
   }
-  
 
-  consultarPerfil(id: number, nome: string, email: string): Perfil {
+  consultarPerfil(id: number | null, nome: string | null, email: string | null): Perfil | null {
     return this._repositorioPerfis.consultar(id, nome, email);
   }
 
   incluirPostagem(postagem: Postagem): void {
     if (this.postagemEhValida(postagem)) {
-
+      this._repositorioPostagens.incluir(postagem);
     }
   }
 
   private postagemEhValida(postagem: Postagem): boolean {
-  if (
-    postagem.id !== null &&
-    postagem.texto !== null &&
-    postagem.curtidas !== null &&
-    postagem.descurtidas !== null &&
-    postagem.perfil !== null &&
-    postagem.data !== null
-  ) {
-    if (postagem instanceof PostagemAvancada) {
-      return postagem.hashtags !== null;
+    if (
+      postagem.id !== null &&
+      postagem.texto !== null &&
+      postagem.curtidas !== null &&
+      postagem.descurtidas !== null &&
+      postagem.perfil !== null &&
+      postagem.data !== null
+    ) {
+      if (postagem instanceof PostagemAvancada) {
+        return postagem.hashtags !== null;
+      }
+      return true;
     }
-    return true;
+    return false;
   }
-  return false;
-}
-
 
   consultarPostagem(
-    id: number,
-    texto: string,
-    hashtag: string,
-    perfil: Perfil
+    id: number | null,
+    texto: string | null,
+    hashtag: string | null,
+    perfil: Perfil | null
   ): Postagem[] {
     return this._repositorioPostagens.consultar(id, texto, hashtag, perfil);
   }
@@ -105,69 +108,92 @@ export class RedeSocial {
     }
   }
 
-  exibirPostagensPerfil(id: number): Postagem[] {
-    let perfil = this._repositorioPerfis.consultar(id, null, null);
+  PostagemPorPerfil(idPerfil: number): Postagem[] {
+    const perfil: Perfil = this.consultarPerfil(
+      idPerfil,
+      null,
+      null
+    );
+    const postagensPerfil: Postagem[] = [];
 
-    for (let postagem of perfil.postagens) {
-      if (postagem instanceof PostagemAvancada) {
-        if (postagem.visualizacoesRestantes > 1) {
-          this.decrementarVisualizacoes(postagem);
+    if (perfil !== null) {
+      for (const postagem of perfil.postagens) {
+        if (
+          postagem instanceof PostagemAvancada &&
+          postagem.podeSerExibida()) {
+          if (postagem.visualizacoesRestantes > 1) {
+            this.decrementarVisualizacoes(postagem)
+          }
+        }
+        postagensPerfil.push(postagem);
+      }
+    }
+    return postagensPerfil;
+  }
+
+  exibirPostagensPorPerfil(idPerfil: number): void {
+    const postagensPerfil = this.PostagemPorPerfil(idPerfil)
+    
+    if (postagensPerfil.length > 0) {
+      console.log(`\nPostagens do user: `)
+      for (const postagem of postagensPerfil) {
+        console.log(this.toStringPostagem(postagem))
+      }
+    }
+  }
+
+  postagemPorHashtag(hashtag: string): Postagem[] {
+    const postagensAlvo = this.consultarPostagem(null, null, hashtag, null)
+
+    if (postagensAlvo.length > 0) {
+      for (let postagem of postagensAlvo) {
+        if (postagem instanceof PostagemAvancada && postagem.podeSerExibida()) {
+          if (postagem.visualizacoesRestantes > 1) {
+            this.decrementarVisualizacoes(postagem)
+          }
         }
       }
     }
-    return perfil.postagens;
-  }
 
-  exibirPostagensPorHashtag(hashtag: string): PostagemAvancada[] {
-    let postagens = this._repositorioPostagens.consultar(null, null, hashtag, null)
-    const postagensFiltradas: PostagemAvancada [] = []
-
-    for (let postagem of postagens) {
-        if (postagem instanceof PostagemAvancada) {
-            if (postagem.visualizacoesRestantes > 1) {
-                this.decrementarVisualizacoes(postagem)
-                postagensFiltradas.push(postagem)
-            }
-        }
-    }
-
-    return postagensFiltradas
+    return postagensAlvo
   }
 
   private formatarData(data: Date): string {
     const dia = data.getDate().toString().padStart(2, "0");
     const mes = (data.getMonth() + 1).toString().padStart(2, "0");
     const ano = data.getFullYear();
-    const hora = data.getHours();
-    const minuto = data.getMinutes();
 
-    return `${dia}/${mes}/${ano}: ${hora}/${minuto}`;
+    return `${dia}/${mes}/${ano}`;
   }
 
   toStringPostagem(postagem: Postagem): string {
-    return `\n${postagem.perfil.nome} em ${this.formatarData(postagem.data)}:\n${
-      postagem.texto
-    }\n curtidas ${postagem.curtidas}, ${postagem.descurtidas}`;
+    let texto = `user: ${postagem.perfil.nome} em ${this.formatarData(
+      postagem.data
+    )}:\n"${postagem.texto}"\ncurtidas ${postagem.curtidas}, descurtidas ${
+      postagem.descurtidas
+    }`;
+
+    if (postagem instanceof PostagemAvancada) {
+      texto += `\nHashtags: ${postagem.hashtags}` +
+      `\nVisualizações restantes: ${postagem.visualizacoesRestantes}`
+    }
+
+    return texto;
   }
 }
 
+let faceboque = new RedeSocial()
 
-// teste
+faceboque.incluirPerfil(new Perfil(1, 'zezin do gas', 'zezin@hotmail.com'))
+faceboque.incluirPerfil(new Perfil(2, 'zezin do gas2', 'zezin2@hotmail.com'))
+faceboque.incluirPerfil(new Perfil(3, 'zezin do gas3', 'zezin3@hotmail.com'))
 
-let facetruco: RedeSocial = new RedeSocial()
-let perfil: Perfil = new Perfil(1, 'luiz', 'ti@.com')
-let perfil2: Perfil = new Perfil(2, 'maconha', 'cannabis@.com')
-facetruco.incluirPerfil(perfil)
-facetruco.incluirPerfil(perfil2)
+faceboque.incluirPostagem(new Postagem(1, 'Taticas de guerrilha, vol 1', 100, 500, new Date(), faceboque.consultarPerfil(1, null, null)))
 
-console.log(facetruco.repositorioPerfis.perfis)
+let postagem = new PostagemAvancada(4, '2050 homens ?', 10, 0, new Date(), faceboque.consultarPerfil(3, null, null), ['#carlinhos', '#mamei2050'])
 
-let postagem: Postagem = new Postagem(1, 'bostil: tanke-o ou deixe-o', 0, 0, new Date(), perfil)
-let postagem2: Postagem = new Postagem(2, 'bostil: tanke-o ou deixe-o', 0, 0, new Date(), perfil2)
+faceboque.incluirPostagem(postagem)
 
-console.log()
-
-facetruco.incluirPostagem(postagem)
-facetruco.incluirPostagem(postagem2)
-
-console.log(facetruco.exibirPostagensPerfil(perfil.id))
+faceboque.exibirPostagensPorPerfil(1)
+faceboque.exibirPostagensPorPerfil(2)
+faceboque.exibirPostagensPorPerfil(3)

@@ -1,9 +1,10 @@
 import { Postagem } from "./Postagem.js";
 export class PostagemAvancada extends Postagem {
-    constructor(id, texto, curtidas, descurtidas, data, perfil) {
+    _hashtags;
+    constructor(id, texto, curtidas, descurtidas, data, perfil, _hashtags = []) {
         super(id, texto, curtidas, descurtidas, data, perfil);
+        this._hashtags = _hashtags;
     }
-    _hashtags = [];
     _visualizacoesRestantes = 1000;
     get hashtags() {
         return this._hashtags;
@@ -23,5 +24,8 @@ export class PostagemAvancada extends Postagem {
     }
     diminuirVisualizacoes() {
         this._visualizacoesRestantes--;
+    }
+    podeSerExibida() {
+        return this._visualizacoesRestantes > 0;
     }
 }
