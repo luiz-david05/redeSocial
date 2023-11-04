@@ -10,7 +10,6 @@ class App {
         console.log(texto);
     }
     run() {
-        this.menu();
         let opcao;
         do {
             this.menu();
@@ -20,9 +19,10 @@ class App {
                     this.criarPerfil();
                     break;
                 default:
-                    console.log("Incorrect option: " + opcao);
+                    console.log("Opção inválida");
             }
         } while (opcao != 0);
+        console.log("APLICAÇÃO FINALIZADA!");
     }
     criarPerfil() {
         console.log("\nCriar perfil\n");
@@ -33,6 +33,7 @@ class App {
         }
         let email = input("email do perfil: ");
         this._redeSocial.incluirPerfil(new Perfil(id, nome, email));
+        console.log("Perfil criado com sucesso!");
     }
     gerarId() {
         return Math.floor(Math.random() * 999999);

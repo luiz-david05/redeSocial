@@ -14,13 +14,11 @@ class App {
     }
 
     run() {
-        this.menu()
-
+        
         let opcao: number
-
+        
         do {
             this.menu()
-
             opcao = getNumber("\nSelecione uma opção: ")
 
             switch (opcao) {
@@ -28,9 +26,11 @@ class App {
                     this.criarPerfil()
                     break
                 default:
-                    console.log("Incorrect option: " + opcao)
+                    console.log("Opção inválida")
             }
         } while (opcao != 0)
+
+        console.log("APLICAÇÃO FINALIZADA!")
     }
 
     criarPerfil(): void {
@@ -45,6 +45,8 @@ class App {
         let email = input("email do perfil: ")
 
         this._redeSocial.incluirPerfil(new Perfil(id, nome, email))
+
+        console.log("Perfil criado com sucesso!")
     }
 
     gerarId(): number {

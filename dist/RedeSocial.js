@@ -1,7 +1,5 @@
 import { RepositorioDePerfis } from "./repositorios/RepositorioDePerfis.js";
 import { RepositorioDePostagens } from "./repositorios/RepositorioDePostagens.js";
-import { Perfil } from "./basicas/Perfil.js";
-import { Postagem } from "./basicas/Postagem.js";
 import { PostagemAvancada } from "./basicas/PostagemAvancada.js";
 export class RedeSocial {
     _repositorioPerfis = new RepositorioDePerfis();
@@ -124,13 +122,3 @@ export class RedeSocial {
         return texto;
     }
 }
-let faceboque = new RedeSocial();
-faceboque.incluirPerfil(new Perfil(1, 'zezin do gas', 'zezin@hotmail.com'));
-faceboque.incluirPerfil(new Perfil(2, 'zezin do gas2', 'zezin2@hotmail.com'));
-faceboque.incluirPerfil(new Perfil(3, 'zezin do gas3', 'zezin3@hotmail.com'));
-faceboque.incluirPostagem(new Postagem(1, 'Taticas de guerrilha, vol 1', 100, 500, new Date(), faceboque.consultarPerfil(1, null, null)));
-let postagem = new PostagemAvancada(4, '2050 homens ?', 10, 0, new Date(), faceboque.consultarPerfil(3, null, null), ['#carlinhos', '#mamei2050']);
-faceboque.incluirPostagem(postagem);
-faceboque.exibirPostagensPorPerfil(1);
-faceboque.exibirPostagensPorPerfil(2);
-faceboque.exibirPostagensPorPerfil(3);
