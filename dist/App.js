@@ -7,6 +7,10 @@ import * as fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 class App {
     _redeSocial = new RedeSocial();
+    static main() {
+        let app = new App();
+        app.run();
+    }
     salvarPerfis() {
         const perfis = this._redeSocial.repositorioPerfis.perfis;
         const perfisParaEscrever = perfis.map((perfil) => {
@@ -256,5 +260,4 @@ class App {
         console.log("\nAPLICAÇÃO FINALIZADA!");
     }
 }
-let app = new App();
-app.run();
+App.main();

@@ -1,4 +1,2 @@
-pa;d0b09c42-f45a-410e-9f22-325e11dbed41;eu amo o @Luiz;0;0;05/11/2023;f26d412f-8c91-4fdd-bc6b-16afd63421ea;#amor;988
-pa;2fb59616-67df-43f9-b22f-b228b6024bf6;eu amo a @camila;0;0;05/11/2023;b634184e-85e1-40d0-81b2-a812677a77be;#amor;1
 p;24cc7671-b7f5-43e4-9927-12d1a410fdda;bater o recorde mundial em;0;0;05/11/2023;b634184e-85e1-40d0-81b2-a812677a77be
 pa;e35925a6-ab01-41d1-89cd-d121efa118eb;typescript eh bom demais;50;0;05/11/2023;e304c77f-6a42-47c1-bd63-9268356cbee4;#typescript;976

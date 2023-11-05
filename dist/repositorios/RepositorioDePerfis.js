@@ -17,11 +17,3 @@ export class RepositorioDePerfis {
         return null;
     }
 }
-// fazer testes aqui amannhã
-// let repositorioPerfis = new RepositorioDePerfis()
-// let perfil = new Perfil(3, 'david', 'cannabis@gmail.com')
-// let perfil2 = new Perfil(3, 'luiz', 'cannabis@gmail.com')
-// repositorioPerfis.incluir(perfil)
-// repositorioPerfis.incluir(perfil2)
-// let perfilAlvo = repositorioPerfis.consultar(3, null, null)
-// console.log(perfilAlvo)
