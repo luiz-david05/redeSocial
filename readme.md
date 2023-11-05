@@ -1,3 +1,5 @@
+Autor: Luiz David Silva Gomes
+
 # Clone o repositório: 
 https://github.com/luiz-david05/redeSocial.git
 
