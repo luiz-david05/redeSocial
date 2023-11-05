@@ -1,4 +1,3 @@
-import { Console } from "console";
 import { RedeSocial } from "./RedeSocial.js";
 import { Perfil } from "./basicas/Perfil.js";
 import { Postagem } from "./basicas/Postagem.js";
