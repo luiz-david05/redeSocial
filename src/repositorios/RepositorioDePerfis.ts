@@ -12,7 +12,7 @@ export class RepositorioDePerfis {
   }
 
   consultar(
-    id: number | null,
+    id: string | null,
     nome: string | null,
     email: string | null
   ): Perfil | null {

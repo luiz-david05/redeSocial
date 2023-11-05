@@ -2,11 +2,11 @@ import { Perfil } from "./Perfil.js";
 
 export class Postagem {
   constructor(
-    private _id: number,
+    private _id: string,
     private _texto: string,
     private _curtidas: number,
     private _descurtidas: number,
-    private _data: Date,
+    private _data: string,
     private _perfil: Perfil
   ) {}
 

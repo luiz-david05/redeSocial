@@ -15,7 +15,7 @@ export class RepositorioDePostagens {
   }
 
   consultar(
-    id: number | null,
+    id: string | null,
     texto: string | null,
     hashtag: string | null,
     perfil: Perfil | null

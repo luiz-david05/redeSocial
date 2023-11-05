@@ -3,18 +3,18 @@ import { Postagem } from "./Postagem.js";
 
 export class PostagemAvancada extends Postagem {
   constructor(
-    id: number,
+    id: string,
     texto: string,
     curtidas: number,
     descurtidas: number,
-    data: Date,
+    data: string,
     perfil: Perfil,
-    private _hashtags: string[] = []
+    private _hashtags: string[] = [],
+    private _visualizacoesRestantes: number
   ) {
     super(id, texto, curtidas, descurtidas, data, perfil);
   }
 
-  private _visualizacoesRestantes = 1000
 
   get hashtags(): string[] {
     return this._hashtags;

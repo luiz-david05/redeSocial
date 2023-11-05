@@ -4,7 +4,6 @@ import { PostagemAvancada } from "./basicas/PostagemAvancada.js";
 export class RedeSocial {
     _repositorioPerfis = new RepositorioDePerfis();
     _repositorioPostagens = new RepositorioDePostagens();
-    // teste
     get repositorioPerfis() {
         return this._repositorioPerfis;
     }
@@ -12,15 +11,10 @@ export class RedeSocial {
         return this._repositorioPostagens;
     }
     incluirPerfil(perfil) {
-        // Verifica se todos os atributos do perfil estão preenchidos
         if (perfil.id !== null && perfil.nome !== null && perfil.email !== null) {
-            // Verifica se já existe um perfil com o mesmo id
             if (this.repositorioPerfis.consultar(perfil.id, null, null) === null) {
-                // Verifica se já existe um perfil com o mesmo nome
                 if (this.repositorioPerfis.consultar(null, perfil.nome, null) === null) {
-                    // Verifica se já existe um perfil com o mesmo email
                     if (this.repositorioPerfis.consultar(null, null, perfil.email) === null) {
-                        // Se todos os testes passarem, inclui o perfil
                         this.repositorioPerfis.incluir(perfil);
                     }
                 }
@@ -74,25 +68,28 @@ export class RedeSocial {
         const postagensPerfil = [];
         if (perfil !== null) {
             for (const postagem of perfil.postagens) {
-                if (postagem instanceof PostagemAvancada &&
-                    postagem.podeSerExibida()) {
-                    if (postagem.visualizacoesRestantes > 1) {
-                        this.decrementarVisualizacoes(postagem);
-                    }
+                if (postagem instanceof PostagemAvancada && !postagem.podeSerExibida()) {
                 }
-                postagensPerfil.push(postagem);
+                else {
+                    postagensPerfil.push(postagem);
+                }
             }
         }
         return postagensPerfil;
     }
-    exibirPostagensPorPerfil(idPerfil) {
-        const postagensPerfil = this.PostagemPorPerfil(idPerfil);
-        if (postagensPerfil.length > 0) {
-            console.log(`\nPostagens do user: `);
-            for (const postagem of postagensPerfil) {
-                console.log(this.toStringPostagem(postagem));
-            }
+    toStringPostagem(postagem) {
+        let texto = "\n---------------- POSTAGEM ----------------\n";
+        texto += `ID do usuário: ${postagem.perfil.id}\n`;
+        texto += `Nome: ${postagem.perfil.nome}\n`;
+        texto += `Postagem: "${postagem.texto}"\n`;
+        texto += `Curtidas: ${postagem.curtidas}, Descurtidas: ${postagem.descurtidas}\n`;
+        if (postagem instanceof PostagemAvancada) {
+            texto += "Hashtags: ";
+            texto += postagem.hashtags.join(", ") + "\n";
+            texto += `Vizualizações restantes: ${postagem.visualizacoesRestantes}`;
         }
+        texto += "\n---------------- FIM DA POSTAGEM ----------------\n";
+        return texto;
     }
     postagemPorHashtag(hashtag) {
         const postagensAlvo = this.consultarPostagem(null, null, hashtag, null);
@@ -107,18 +104,62 @@ export class RedeSocial {
         }
         return postagensAlvo;
     }
+    obterHashtagsPopulares() {
+        const postagens = this._repositorioPostagens.postagens;
+        const todasHashtags = [];
+        postagens.forEach((postagem) => {
+            if (postagem instanceof PostagemAvancada) {
+                todasHashtags.push(...postagem.hashtags);
+            }
+        });
+        const countHashtags = new Map();
+        todasHashtags.forEach((hashtag) => {
+            const count = countHashtags.get(hashtag) || 0;
+            countHashtags.set(hashtag, count + 1);
+        });
+        const hashtagsPopulares = Array.from(countHashtags.entries())
+            .sort((a, b) => b[1] - a[1])
+            .map(([hashtag]) => hashtag);
+        return hashtagsPopulares;
+    }
+    exibirHashtagsPopulares() {
+        console.log("\nHashtags Populares:");
+        const hashtagsPopulares = this.obterHashtagsPopulares();
+        if (hashtagsPopulares.length > 0) {
+            for (let i = 0; i < hashtagsPopulares.length; i++) {
+                console.log(`#${hashtagsPopulares[i]}`);
+            }
+        }
+        else {
+            console.log("Nenhuma hashtag popular encontrada.");
+        }
+    }
     formatarData(data) {
         const dia = data.getDate().toString().padStart(2, "0");
         const mes = (data.getMonth() + 1).toString().padStart(2, "0");
         const ano = data.getFullYear();
         return `${dia}/${mes}/${ano}`;
     }
-    toStringPostagem(postagem) {
-        let texto = `user: ${postagem.perfil.nome} em ${this.formatarData(postagem.data)}:\n"${postagem.texto}"\ncurtidas ${postagem.curtidas}, descurtidas ${postagem.descurtidas}`;
+    toStringPostagemArquivo(postagem) {
+        let tipo = "p";
         if (postagem instanceof PostagemAvancada) {
-            texto += `\nHashtags: ${postagem.hashtags}` +
-                `\nVisualizações restantes: ${postagem.visualizacoesRestantes}`;
+            tipo = "pa";
         }
-        return texto;
+        let postagemString = `${tipo};${postagem.id};${postagem.texto};${postagem.curtidas};${postagem.descurtidas};${postagem.data};${postagem.perfil.id}`;
+        if (postagem instanceof PostagemAvancada) {
+            const hashtagsString = postagem.hashtags.join(",");
+            postagemString += `;${hashtagsString};${postagem.visualizacoesRestantes}`;
+        }
+        return postagemString;
+    }
+    toStringPerfilArquivo(perfil) {
+        return `${perfil.id};${perfil.nome};${perfil.email}`;
+    }
+    filtrarPostagensPopulares() {
+        const postagens = this._repositorioPostagens.postagens;
+        const postagensPopulares = postagens
+            .filter((postagem) => postagem.ehPopular())
+            .sort((a, b) => b.curtidas - a.curtidas);
+        return postagensPopulares.slice(0, 10);
     }
 }

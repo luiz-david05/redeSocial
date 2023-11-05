@@ -2,7 +2,7 @@ import { Postagem } from "./Postagem.js";
 
 export class Perfil {
   constructor(
-    private _id: number,
+    private _id: string,
     private _nome: string,
     private _email: string
   ) {}

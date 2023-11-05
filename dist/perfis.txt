@@ -1,0 +1,8 @@
+b634184e-85e1-40d0-81b2-a812677a77be;Luiz;luiz@teste.com
+f26d412f-8c91-4fdd-bc6b-16afd63421ea;camila;camilalinda@gmail.com
+c1f15ad8-7ec5-4fd8-9806-89e4320aa689;camila torres;camila@teste.com
+e240669e-8a52-4ab3-8896-fa95eaf13ea7;adm;adm@adm.com
+58b40ef5-1ec9-4c6b-bb77-e17fb3731e3e;meianoiteteconto;meianoite@gmail.com
+a88e05e2-d31b-4d1d-8658-238003e52cf6;pescocofino;joaoembaixadinha@gmail.com
+e304c77f-6a42-47c1-bd63-9268356cbee4;obonzao;bonzao@gmail.com
+a6014b78-e761-46b8-80fd-ba0d3c1e71bd;luizao;luizao@gmail.com
