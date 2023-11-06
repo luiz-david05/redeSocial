@@ -6,19 +6,27 @@ https://github.com/luiz-david05/redeSocial.git
 # Instale o node:
 Certifique-se de ter o Node.js instalado em seu sistema. Você pode baixá-lo em https://nodejs.org/en/download. Siga as instruções de instalação apropriadas para o seu sistema operacional.
 
-# Instale a biblioteca uuid
+# Bibliotecas necessárias:
+
+uuid para gerar o id do usuário
 ```bash
 npm install uuid
 ```
 
-# Navegue até a pasta 'dist':
-Após clonar o repositório:
+chalk para colorir o terminal
+```bash
+npm install chalk
+```
+
+# Como executar:
+Após clonar o repositório, abra o terminal e navegue até a pasta do projeto, após isso navegue até a pasta dist:
 
 ```bash
 cd .\dist\
 ```
 
-# Execute o aplicativo:
+Após isso execute o app:
+
 ```bash
 node App.js
 ```

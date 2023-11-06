@@ -1,6 +1,3 @@
-b634184e-85e1-40d0-81b2-a812677a77be;Luiz;luiz@teste.com
-e240669e-8a52-4ab3-8896-fa95eaf13ea7;adm;adm@adm.com
-58b40ef5-1ec9-4c6b-bb77-e17fb3731e3e;meianoiteteconto;meianoite@gmail.com
-a88e05e2-d31b-4d1d-8658-238003e52cf6;pescocofino;joaoembaixadinha@gmail.com
-e304c77f-6a42-47c1-bd63-9268356cbee4;obonzao;bonzao@gmail.com
-a6014b78-e761-46b8-80fd-ba0d3c1e71bd;luizao;luizao@gmail.com
+787521f6-632d-4624-91f0-209e1457f14e;Malphite;malphitepedra@gmail.com
+719fb0da-41c1-4faf-925d-90df8c4be196;Malphite an�o;maplhiteanao@hotmail.com
+b4e26bdc-2306-4dc1-93c6-07f698875bd0;omg albert einstein;albert@gmail.com

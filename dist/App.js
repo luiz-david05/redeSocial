@@ -2,9 +2,8 @@ import { RedeSocial } from "./RedeSocial.js";
 import { Perfil } from "./basicas/Perfil.js";
 import { Postagem } from "./basicas/Postagem.js";
 import { PostagemAvancada } from "./basicas/PostagemAvancada.js";
-import { getNumber, input } from "./utils.js";
+import * as utils from "./utils.js";
 import * as fs from "fs";
-import { v4 as uuidv4 } from "uuid";
 class App {
     _redeSocial = new RedeSocial();
     static main() {
@@ -25,18 +24,10 @@ class App {
             .toString()
             .split("\n");
         for (let perfil of perfisFile) {
-            const trimmedPerfil = perfil.trim();
-            if (trimmedPerfil !== "") {
-                const dadosPerfil = trimmedPerfil.split(";");
-                if (dadosPerfil.length === 3) {
-                    const [id, nome, email] = dadosPerfil;
-                    const novoPerfil = new Perfil(id, nome, email);
-                    this._redeSocial.incluirPerfil(novoPerfil);
-                }
-                else {
-                    return;
-                }
-            }
+            const dadosPerfil = perfil.split(";");
+            const [id, nome, email] = dadosPerfil;
+            let novoPerfil = new Perfil(id, nome, email);
+            this._redeSocial.incluirPerfil(novoPerfil);
         }
     }
     salvarPostagens() {
@@ -67,21 +58,30 @@ class App {
         }
     }
     getTipoPostagem() {
-        console.log("Tipo de postagem: [P] - Postagem, [PA] -Postagem Avançada ");
-        let tipo = input("tipo: ").toLowerCase().trim();
+        console.log("Tipo de postagem: [p] - postagem, [pa] - postagem avançada ");
+        let tipo = utils.input("tipo: ").toLowerCase().trim();
         while (tipo != "p" && tipo != "pa") {
-            tipo = input("tipo: ").toLowerCase().trim();
+            tipo = utils.input("tipo: ").toLowerCase().trim();
         }
         return tipo;
     }
     criarPostagem() {
         console.log("\nCriar postagem\n");
-        let id = this.gerarId();
-        let tipo = this.getTipoPostagem();
-        let nomeUser = input("Nome do usuário: ");
-        let texto = input("Texto da postagem: ");
+        let id = utils.gerarId();
+        let nomeUser = utils.input("Nome do usuário: ");
         let perfil = this._redeSocial.consultarPerfil(null, nomeUser, null);
+        let tipo;
+        let texto;
+        if (perfil) {
+            texto = utils.input("Texto da postagem: ");
+            tipo = this.getTipoPostagem();
+        }
+        else {
+            console.log("\nPerfil não encontrado!");
+            return;
+        }
         if (texto == "") {
+            console.log("\nCampo vazio!");
             return;
         }
         let postagem;
@@ -90,34 +90,38 @@ class App {
         }
         else if (tipo == "pa") {
             console.log("Deseja adicionar hashtags ? [s]/[n]");
-            let resposta = input("resposta: ");
+            let resposta = utils.input("resposta: ");
             const hashtags = [];
             while (resposta === "s") {
-                let hashtag = input("Digite uma hashtag: ");
+                let hashtag = utils.input("Digite uma hashtag: ");
+                if (!hashtag.includes("#")) {
+                    console.log("Adicione # a hashtag!");
+                    hashtag = utils.input("Digite uma hashtag: ");
+                }
                 hashtags.push(hashtag);
                 console.log("Deseja adicionar outra hashtag? [s]/[n]");
-                resposta = input("resposta: ");
+                resposta = utils.input("resposta: ");
             }
             postagem = new PostagemAvancada(id, texto, 0, 0, this._redeSocial.formatarData(new Date()), perfil, hashtags, 1000);
         }
         this._redeSocial.incluirPostagem(postagem);
+        console.log("\nPostagem criada com sucesso!");
     }
     criarPerfil() {
         console.log("\nCriar perfil\n");
-        let id = this.gerarId();
-        let nome = input("nome do perfil: ");
+        let id = utils.gerarId();
+        let nome = utils.input("nome do perfil: ");
         if (nome === "") {
+            console.log("\nCampo vazio!");
             return;
         }
-        let email = input("email do perfil: ");
-        if (email === "" || !email.includes("@")) {
+        let email = utils.input("email do perfil: ");
+        if (email === "" || !email.includes("@") || !email.includes(".com")) {
+            console.log("\nEmail inválido!");
             return;
         }
         this._redeSocial.incluirPerfil(new Perfil(id, nome, email));
-        console.log("Perfil criado com sucesso!");
-    }
-    gerarId() {
-        return uuidv4();
+        console.log("\nPerfil criado com sucesso!");
     }
     exibirPostagensPopulares() {
         console.log("\n\t--- POSTAGENS POPULARES ---\n");
@@ -125,12 +129,13 @@ class App {
         if (postagensPopulares.length > 0) {
             for (let i = 0; i < postagensPopulares.length; i++) {
                 const postagem = postagensPopulares[i];
-                if (postagem instanceof PostagemAvancada && postagem.podeSerExibida) {
+                if (postagem instanceof PostagemAvancada &&
+                    postagem.podeSerExibida) {
                     this._redeSocial.decrementarVisualizacoes(postagem);
                 }
                 console.log(`Postagem ${i + 1}:\n${this._redeSocial.toStringPostagem(postagem)}\n`);
                 if ((i + 1) % 3 === 0 && i < postagensPopulares.length - 1) {
-                    input("\nPressione Enter para ver mais postagens...\n");
+                    utils.input("\nPressione Enter para ver mais postagens...\n");
                 }
             }
         }
@@ -139,41 +144,43 @@ class App {
         }
     }
     exibirFeedPostagens() {
-        console.log("\n\t-------FEED DE POSTAGENS--------\n");
+        console.log("\n\t\t-------FEED DE POSTAGENS--------\n");
         const postagens = this._redeSocial.repositorioPostagens.postagens;
         if (postagens.length > 0) {
             for (let i = 0; i < postagens.length; i++) {
                 const postagem = postagens[i];
-                if (postagem instanceof PostagemAvancada && postagem.podeSerExibida) {
+                if (postagem instanceof PostagemAvancada &&
+                    postagem.podeSerExibida) {
                     this._redeSocial.decrementarVisualizacoes(postagem);
                 }
                 console.log(`Postagem ${i + 1}:\n${this._redeSocial.toStringPostagem(postagem)}\n`);
                 if ((i + 1) % 3 === 0 && i < postagens.length - 1) {
-                    input("\nPressione Enter para ver mais postagens...\n");
+                    utils.input("\nPressione Enter para ver mais postagens...\n");
                 }
             }
         }
         else {
-            console.log("Não há postagens para exibir.");
+            console.log("\nNão há postagens para exibir!");
         }
     }
     exibirHashtagsPopulares() {
         this._redeSocial.exibirHashtagsPopulares();
     }
     exibirPostagensPorPerfil() {
-        let nome = input("Nome do usuário: ");
+        let nome = utils.input("Nome do usuário: ");
         let perfil = this._redeSocial.consultarPerfil(null, nome, null);
         const postagens = this._redeSocial.PostagemPorPerfil(perfil.id);
         console.log("\n\t-------POSTAGENS DO PERFIL--------\n");
         if (postagens.length > 0) {
             for (let i = 0; i < postagens.length; i++) {
                 const postagem = postagens[i];
-                if (postagem instanceof PostagemAvancada && postagem.podeSerExibida()) {
+                if (postagem instanceof PostagemAvancada &&
+                    postagem.podeSerExibida()) {
                     this._redeSocial.decrementarVisualizacoes(postagem);
                 }
                 console.log(`Postagem ${i + 1}:\n${this._redeSocial.toStringPostagem(postagem)}\n`);
                 if ((i + 1) % 3 === 0 && i < postagens.length - 1) {
-                    input("\nPressione Enter para ver mais postagens...\n");
+                    utils.input("\nPressione Enter para ver mais postagens...\n");
                 }
             }
         }
@@ -182,14 +189,22 @@ class App {
         }
     }
     exibirPostagensPorHashtag() {
-        let hashtag = input("Hashtag para a pesquisa: #");
+        let hashtag = utils.input("Hashtag para a pesquisa: ");
+        if (hashtag == "" || !hashtag.includes("#")) {
+            console.log("\nHashtag inválida!");
+            return;
+        }
         const postagens = this._redeSocial.postagemPorHashtag(hashtag);
         if (postagens.length > 0) {
             for (let i = 0; i < postagens.length; i++) {
                 const postagem = postagens[i];
+                if (postagem instanceof PostagemAvancada &&
+                    postagem.podeSerExibida()) {
+                    this._redeSocial.decrementarVisualizacoes(postagem);
+                }
                 console.log(`Postagem ${i + 1}:\n${this._redeSocial.toStringPostagem(postagem)}\n`);
                 if ((i + 1) % 3 === 0 && i < postagens.length - 1) {
-                    input("\nPressione Enter para ver mais postagens...\n");
+                    utils.input("\nPressione Enter para ver mais postagens...\n");
                 }
             }
         }
@@ -205,31 +220,34 @@ class App {
             `\t4 - Exibir Feed de postagens\n` +
             `\t5 - Exibir Hashtags Populares\n` +
             `\t6 - Exibir Postagens por perfil\n` +
+            `\t7 - Exibir postagens por hashtag\n` +
             `\t0 - Sair`;
         console.log(texto);
     }
     run() {
         console.log("Carregando dados da aplicação...");
-        input("\nenter para continuar...");
+        utils.input("\nenter para continuar...");
         try {
             this.carregarPerfis();
             this.carregarPostagens();
             let qtdPerfisOnline = this._redeSocial.repositorioPerfis.perfis.length;
             console.log("\nDados carregados com sucesso!\n");
-            console.log(`\nQuantidade de camaradas online: ${qtdPerfisOnline}`);
-            console.log("\nSeja bem vindo ao Ancapistão!");
+            console.log(`\nQuantidade de perfis online: ${qtdPerfisOnline}`);
+            console.log("\nSeja bem vindo(a)!");
         }
         catch (error) {
             console.log(`\nSabotaram os dados: ${error}`);
         }
+        const logo = "CARALIVRO";
         console.log("\t================================");
-        console.log("\t||         ANCAPISTÃO         ||");
+        console.log(`\t||         ${logo}         ||`);
         console.log("\t================================");
         let opcao;
         do {
-            input("\nenter to continue...");
+            utils.input("\nenter to continue...");
+            utils.limparTela();
             this.menu();
-            opcao = getNumber("\nSelecione uma opção: ");
+            opcao = utils.getNumber("\nSelecione uma opção: ");
             switch (opcao) {
                 case 0:
                     break;
@@ -251,13 +269,16 @@ class App {
                 case 6:
                     this.exibirPostagensPorPerfil();
                     break;
+                case 7:
+                    this.exibirPostagensPorHashtag();
+                    break;
                 default:
                     console.log("Opção inválida");
             }
         } while (opcao != 0);
         this.salvarPerfis();
         this.salvarPostagens();
-        console.log("\nAPLICAÇÃO FINALIZADA!");
+        console.log("\nBye! Have a beautiful time!");
     }
 }
 App.main();

@@ -3,6 +3,7 @@ import { RepositorioDePostagens } from "./repositorios/RepositorioDePostagens.js
 import { Perfil } from "./basicas/Perfil.js";
 import { Postagem } from "./basicas/Postagem.js";
 import { PostagemAvancada } from "./basicas/PostagemAvancada.js";
+import chalk from "chalk";
 
 export class RedeSocial {
   private _repositorioPerfis: RepositorioDePerfis = new RepositorioDePerfis();
@@ -81,7 +82,6 @@ export class RedeSocial {
       null
     );
 
-    // garantir que o id sejá único para cada postagem
     let postagem = postagens[0];
     postagem.curtir();
   }
@@ -94,13 +94,12 @@ export class RedeSocial {
       null
     );
 
-    // garantir que o id sejá único para cada postagem
     let postagem = postagens[0];
     postagem.descurtir();
   }
 
   decrementarVisualizacoes(postagem: PostagemAvancada): void {
-    if (postagem.visualizacoesRestantes > 0) {
+    if (postagem.podeSerExibida()) {
       postagem.diminuirVisualizacoes();
     }
   }
@@ -122,36 +121,36 @@ export class RedeSocial {
   
 
   toStringPostagem(postagem: Postagem): string {
-    let texto = "\n---------------- POSTAGEM ----------------\n";
-    texto += `ID do usuário: ${postagem.perfil.id}\n`;
-    texto += `Nome: ${postagem.perfil.nome}\n`;
-    texto += `Postagem: "${postagem.texto}"\n`;
-    texto += `Curtidas: ${postagem.curtidas}, Descurtidas: ${postagem.descurtidas}\n`;
+    let texto = chalk.underline("\n---------------- POSTAGEM ------------------------\n")+
+    chalk.whiteBright(`\n${postagem.perfil.nome}`) + chalk.gray(`\t@${postagem.perfil.nome}\n`) +
+    `Postagem feita em: ${postagem.data}\n`+
+    `Post: ` + chalk.greenBright(`"${postagem.texto}"\n`) +
+    `Curtidas: ` + chalk.yellowBright(`${postagem.curtidas}, `) + `Descurtidas: ` + chalk.yellowBright(`${postagem.descurtidas}`) + '\n';
   
     if (postagem instanceof PostagemAvancada) {
       texto += "Hashtags: ";
-      texto += postagem.hashtags.join(", ") + "\n";
-      texto += `Vizualizações restantes: ${postagem.visualizacoesRestantes}`;
+      texto += postagem.hashtags.map(hashtag => chalk.blue(`${hashtag}`)).join(', ') + '\n'
+      texto += `Vizualizações restantes: ` + chalk.yellowBright(`${postagem.visualizacoesRestantes}`) + '\n'
     }
   
-    texto += "\n---------------- FIM DA POSTAGEM ----------------\n";
+    texto += chalk.underline("\n--------------- FIM DA POSTAGEM ------------------");
     return texto;
   }
 
   postagemPorHashtag(hashtag: string): Postagem[] {
     const postagensAlvo = this.consultarPostagem(null, null, hashtag, null);
+    const postagensFiltradas: Postagem[] = []
 
     if (postagensAlvo.length > 0) {
-      for (let postagem of postagensAlvo) {
-        if (postagem instanceof PostagemAvancada && postagem.podeSerExibida()) {
-          if (postagem.visualizacoesRestantes > 1) {
-            this.decrementarVisualizacoes(postagem)
-          }
+      for (const postagem of postagensAlvo) {
+        if (postagem instanceof PostagemAvancada && !postagem.podeSerExibida()) {
+        } else {
+          postagensFiltradas.push(postagem)
         }
       }
     }
 
-    return postagensAlvo;
+    return postagensFiltradas;
   }
   
   obterHashtagsPopulares(): string[] {
@@ -185,7 +184,7 @@ export class RedeSocial {
   
     if (hashtagsPopulares.length > 0) {
       for (let i = 0; i < hashtagsPopulares.length; i++) {
-        console.log(`#${hashtagsPopulares[i]}`);
+        console.log(chalk.blue(`${i+1}° ${hashtagsPopulares[i]}`));
       }
     } else {
       console.log("Nenhuma hashtag popular encontrada.");
