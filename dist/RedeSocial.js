@@ -1,5 +1,6 @@
 import { RepositorioDePerfis } from "./repositorios/RepositorioDePerfis.js";
 import { RepositorioDePostagens } from "./repositorios/RepositorioDePostagens.js";
+import { Postagem } from "./basicas/Postagem.js";
 import { PostagemAvancada } from "./basicas/PostagemAvancada.js";
 import chalk from "chalk";
 export class RedeSocial {
@@ -11,24 +12,19 @@ export class RedeSocial {
     get repositorioPostagens() {
         return this._repositorioPostagens;
     }
+    perfilEhValido(perfil) {
+        return (perfil.id !== null && perfil.nome !== null && perfil.email !== null);
+    }
     incluirPerfil(perfil) {
-        if (perfil.id !== null && perfil.nome !== null && perfil.email !== null) {
-            if (this.repositorioPerfis.consultar(perfil.id, null, null) === null) {
-                if (this.repositorioPerfis.consultar(null, perfil.nome, null) === null) {
-                    if (this.repositorioPerfis.consultar(null, null, perfil.email) === null) {
-                        this.repositorioPerfis.incluir(perfil);
-                    }
-                }
-            }
+        if (this.perfilEhValido(perfil) &&
+            this.consultarPerfil(perfil.id, perfil.nome, perfil.email) === null) {
+            this._repositorioPerfis.incluir(perfil);
+            return true;
         }
+        return false;
     }
     consultarPerfil(id, nome, email) {
         return this._repositorioPerfis.consultar(id, nome, email);
-    }
-    incluirPostagem(postagem) {
-        if (this.postagemEhValida(postagem)) {
-            this._repositorioPostagens.incluir(postagem);
-        }
     }
     postagemEhValida(postagem) {
         if (postagem.id !== null &&
@@ -38,83 +34,115 @@ export class RedeSocial {
             postagem.perfil !== null &&
             postagem.data !== null) {
             if (postagem instanceof PostagemAvancada) {
-                return postagem.hashtags !== null;
+                return (postagem.hashtags !== null &&
+                    postagem.visualizacoesRestantes !== null);
             }
             return true;
+        }
+        return false;
+    }
+    incluirPostagem(postagem) {
+        if (this.postagemEhValida(postagem)) {
+            if (this.consultarPostagem(postagem.id, null, null, null).length ==
+                0) {
+                this._repositorioPostagens.incluir(postagem);
+                return true;
+            }
         }
         return false;
     }
     consultarPostagem(id, texto, hashtag, perfil) {
         return this._repositorioPostagens.consultar(id, texto, hashtag, perfil);
     }
-    curtirPostagem(id) {
-        const postagens = this._repositorioPostagens.consultar(id, null, null, null);
-        let postagem = postagens[0];
-        postagem.curtir();
+    curtirPostagem(idPostagem) {
+        const postagens = this._repositorioPostagens.consultar(idPostagem, null, null, null);
+        postagens.forEach((postagem) => {
+            if (postagem instanceof PostagemAvancada && postagem.visualizacoesRestantes === 0) {
+                return false;
+            }
+            postagem.curtir();
+        });
+        return true;
     }
-    descurtirPostagem(id) {
-        const postagens = this._repositorioPostagens.consultar(id, null, null, null);
-        let postagem = postagens[0];
-        postagem.descurtir();
+    descurtirPostagem(idPostagem) {
+        const postagens = this._repositorioPostagens.consultar(idPostagem, null, null, null);
+        postagens.forEach((postagem) => {
+            if (postagem instanceof PostagemAvancada && postagem.visualizacoesRestantes === 0) {
+                return false;
+            }
+            postagem.descurtir();
+        });
+        return true;
     }
     decrementarVisualizacoes(postagem) {
-        if (postagem.podeSerExibida()) {
+        if (postagem.visualizacoesRestantes > 0) {
             postagem.diminuirVisualizacoes();
         }
     }
-    PostagemPorPerfil(idPerfil) {
+    exibirPostagensPorPerfil(idPerfil) {
         const perfil = this.consultarPerfil(idPerfil, null, null);
         const postagensPerfil = [];
-        if (perfil !== null) {
-            for (const postagem of perfil.postagens) {
-                if (postagem instanceof PostagemAvancada && !postagem.podeSerExibida()) {
-                }
-                else {
-                    postagensPerfil.push(postagem);
-                }
+        perfil.postagens.forEach((postagem) => {
+            if (postagem instanceof PostagemAvancada &&
+                postagem.visualizacoesRestantes > 0) {
+                postagensPerfil.push(postagem);
             }
-        }
+            if (postagem instanceof PostagemAvancada) {
+                this.decrementarVisualizacoes(postagem);
+            }
+            else if (postagem instanceof Postagem) {
+                postagensPerfil.push(postagem);
+            }
+        });
         return postagensPerfil;
     }
-    toStringPostagem(postagem) {
-        let texto = chalk.underline("\n---------------- POSTAGEM ------------------------\n") +
-            chalk.whiteBright(`\n${postagem.perfil.nome}`) + chalk.gray(`\t@${postagem.perfil.nome}\n`) +
-            `Postagem feita em: ${postagem.data}\n` +
-            `Post: ` + chalk.greenBright(`"${postagem.texto}"\n`) +
-            `Curtidas: ` + chalk.yellowBright(`${postagem.curtidas}, `) + `Descurtidas: ` + chalk.yellowBright(`${postagem.descurtidas}`) + '\n';
-        if (postagem instanceof PostagemAvancada) {
-            texto += "Hashtags: ";
-            texto += postagem.hashtags.map(hashtag => chalk.blue(`${hashtag}`)).join(', ') + '\n';
-            texto += `Vizualizações restantes: ` + chalk.yellowBright(`${postagem.visualizacoesRestantes}`) + '\n';
-        }
-        texto += chalk.underline("\n--------------- FIM DA POSTAGEM ------------------");
-        return texto;
-    }
-    postagemPorHashtag(hashtag) {
-        const postagensAlvo = this.consultarPostagem(null, null, hashtag, null);
-        const postagensFiltradas = [];
-        if (postagensAlvo.length > 0) {
-            for (const postagem of postagensAlvo) {
-                if (postagem instanceof PostagemAvancada && !postagem.podeSerExibida()) {
-                }
-                else {
-                    postagensFiltradas.push(postagem);
-                }
+    exibirPostagensPorHashtag(hashtag) {
+        const postagens = this.consultarPostagem(null, null, hashtag, null);
+        const postagensHashtag = [];
+        postagens.forEach((postagem) => {
+            if (postagem instanceof PostagemAvancada &&
+                postagem.visualizacoesRestantes > 0) {
+                postagensHashtag.push(postagem);
             }
-        }
-        return postagensFiltradas;
+            if (postagem instanceof PostagemAvancada) {
+                this.decrementarVisualizacoes(postagem);
+            }
+        });
+        return postagensHashtag;
+    }
+    exibirPostagensPopulares() {
+        const postagens = this._repositorioPostagens.postagens;
+        const postagensPopulares = [];
+        postagens.forEach((postagem) => {
+            if (postagem instanceof PostagemAvancada &&
+                postagem.visualizacoesRestantes > 0 &&
+                postagem.ehPopular()) {
+                postagensPopulares.push(postagem);
+            }
+            if (postagem instanceof PostagemAvancada) {
+                this.decrementarVisualizacoes(postagem);
+            }
+            else if (postagem instanceof Postagem && postagem.ehPopular()) {
+                postagensPopulares.push(postagem);
+            }
+            // ordenando os elementos de acordo com o número de curtidas
+            postagensPopulares.sort((a, b) => b.curtidas - a.curtidas);
+        });
+        // retorna até as 10 mais populares
+        return postagensPopulares.slice(0, 10);
     }
     obterHashtagsPopulares() {
         const postagens = this._repositorioPostagens.postagens;
         const todasHashtags = [];
         postagens.forEach((postagem) => {
-            if (postagem instanceof PostagemAvancada) {
+            if (postagem instanceof PostagemAvancada &&
+                postagem.visualizacoesRestantes > 0) {
                 todasHashtags.push(...postagem.hashtags);
             }
         });
         const countHashtags = new Map();
         todasHashtags.forEach((hashtag) => {
-            const count = countHashtags.get(hashtag) || 0;
+            const count = countHashtags.get(hashtag);
             countHashtags.set(hashtag, count + 1);
         });
         const hashtagsPopulares = Array.from(countHashtags.entries())
@@ -123,7 +151,7 @@ export class RedeSocial {
         return hashtagsPopulares;
     }
     exibirHashtagsPopulares() {
-        console.log("\nHashtags Populares:");
+        console.log("\nHashtags Populares:\n");
         const hashtagsPopulares = this.obterHashtagsPopulares();
         if (hashtagsPopulares.length > 0) {
             for (let i = 0; i < hashtagsPopulares.length; i++) {
@@ -131,14 +159,71 @@ export class RedeSocial {
             }
         }
         else {
-            console.log("Nenhuma hashtag popular encontrada.");
+            console.log("\nNenhuma hashtag popular encontrada!");
         }
+    }
+    exibirFeedPostagens() {
+        const postagens = this._repositorioPostagens.postagens;
+        const postagensFeed = [];
+        postagens.forEach((postagem) => {
+            if (postagem instanceof PostagemAvancada &&
+                postagem.visualizacoesRestantes > 0) {
+                postagensFeed.push(postagem);
+            }
+            if (postagem instanceof PostagemAvancada) {
+                this.decrementarVisualizacoes(postagem);
+            }
+            else if (postagem instanceof Postagem) {
+                postagensFeed.push(postagem);
+            }
+            postagensFeed.sort((a, b) => b.curtidas - a.curtidas);
+        });
+        return postagensFeed;
+    }
+    // metodos tostring objetos
+    toStringPostagem(postagem) {
+        let texto = chalk.underline("\n---------------- POSTAGEM ------------------------\n") +
+            chalk.whiteBright('\nid postagem: ') + chalk.yellowBright(postagem.id) +
+            chalk.whiteBright(`\n${postagem.perfil.nome}`) +
+            chalk.gray(`\t@${postagem.perfil.nome}\n`) +
+            `Postagem feita em: ${postagem.data}\n` +
+            `Post: ` +
+            chalk.greenBright(`"${postagem.texto}"\n`) +
+            `Curtidas: ` +
+            chalk.yellowBright(`${postagem.curtidas}, `) +
+            `Descurtidas: ` +
+            chalk.yellowBright(`${postagem.descurtidas}`) +
+            "\n";
+        if (postagem instanceof PostagemAvancada) {
+            texto += "Hashtags: ";
+            texto +=
+                postagem.hashtags
+                    .map((hashtag) => chalk.blue(`${hashtag}`))
+                    .join(", ") + "\n";
+            texto +=
+                `Vizualizações restantes: ` +
+                    chalk.yellowBright(`${postagem.visualizacoesRestantes}`) +
+                    "\n";
+        }
+        texto += chalk.underline("\n--------------- FIM DA POSTAGEM ------------------");
+        return texto;
+    }
+    toStringPerfil(perfil) {
+        let texto = chalk.underline(`\n -------------------- Perfil --------------------\n`) +
+            chalk.whiteBright(`\nid: `) + chalk.yellowBright(perfil.id) +
+            chalk.whiteBright(`\nnome: `) + chalk.green(perfil.nome) +
+            chalk.whiteBright(`\ne-mail: `) + chalk.red(perfil.email);
+        return texto;
     }
     formatarData(data) {
         const dia = data.getDate().toString().padStart(2, "0");
         const mes = (data.getMonth() + 1).toString().padStart(2, "0");
         const ano = data.getFullYear();
         return `${dia}/${mes}/${ano}`;
+    }
+    // metodos tostring arquivo
+    toStringPerfilArquivo(perfil) {
+        return `${perfil.id};${perfil.nome};${perfil.email}`;
     }
     toStringPostagemArquivo(postagem) {
         let tipo = "p";
@@ -151,15 +236,5 @@ export class RedeSocial {
             postagemString += `;${hashtagsString};${postagem.visualizacoesRestantes}`;
         }
         return postagemString;
-    }
-    toStringPerfilArquivo(perfil) {
-        return `${perfil.id};${perfil.nome};${perfil.email}`;
-    }
-    filtrarPostagensPopulares() {
-        const postagens = this._repositorioPostagens.postagens;
-        const postagensPopulares = postagens
-            .filter((postagem) => postagem.ehPopular())
-            .sort((a, b) => b.curtidas - a.curtidas);
-        return postagensPopulares.slice(0, 10);
     }
 }

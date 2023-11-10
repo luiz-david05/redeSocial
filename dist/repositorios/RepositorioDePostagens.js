@@ -6,24 +6,14 @@ export class RepositorioDePostagens {
     }
     incluir(postagem) {
         this._postagens.push(postagem);
-        postagem.perfil.incluir(postagem);
+        postagem.perfil.postagens.push(postagem);
     }
     consultar(id, texto, hashtag, perfil) {
-        return this._postagens.filter((postagem) => {
-            if (id !== null && postagem.id !== id) {
-                return false;
-            }
-            if (texto !== null && !postagem.texto.includes(texto)) {
-                return false;
-            }
-            if (hashtag !== null &&
-                !(postagem instanceof PostagemAvancada && postagem.existeHashtag(hashtag))) {
-                return false;
-            }
-            if (perfil !== null && postagem.perfil !== perfil) {
-                return false;
-            }
-            return true;
-        });
+        return this.postagens.filter((postagem) => (id === null || postagem.id == id) &&
+            (texto === null || postagem.texto.indexOf(texto) != 1) &&
+            (hashtag === null ||
+                (postagem instanceof PostagemAvancada &&
+                    postagem.existeHashtag(hashtag))) &&
+            (perfil === null || postagem.perfil == perfil));
     }
 }

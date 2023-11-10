@@ -14,19 +14,12 @@ export class PostagemAvancada extends Postagem {
         return this._visualizacoesRestantes;
     }
     adicionarHashtag(hashtag) {
-        if (!this.existeHashtag(hashtag)) {
-            this._hashtags.push(hashtag);
-            return true;
-        }
-        return false;
+        this.hashtags.push(hashtag);
     }
     existeHashtag(hashtag) {
         return this._hashtags.includes(hashtag);
     }
     diminuirVisualizacoes() {
         this._visualizacoesRestantes--;
-    }
-    podeSerExibida() {
-        return this._visualizacoesRestantes > 0;
     }
 }

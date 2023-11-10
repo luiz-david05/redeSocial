@@ -2,46 +2,36 @@ import { Perfil } from "./Perfil.js";
 import { Postagem } from "./Postagem.js";
 
 export class PostagemAvancada extends Postagem {
-  constructor(
-    id: string,
-    texto: string,
-    curtidas: number,
-    descurtidas: number,
-    data: string,
-    perfil: Perfil,
-    private _hashtags: string[] = [],
-    private _visualizacoesRestantes: number
-  ) {
-    super(id, texto, curtidas, descurtidas, data, perfil);
-  }
-
-
-  get hashtags(): string[] {
-    return this._hashtags;
-  }
-
-  get visualizacoesRestantes() {
-    return this._visualizacoesRestantes;
-  }
-
-  adicionarHashtag(hashtag: string): boolean {
-    if (!this.existeHashtag(hashtag)) {
-        this._hashtags.push(hashtag);
-        return true;
+    constructor(
+        id: string,
+        texto: string,
+        curtidas: number,
+        descurtidas: number,
+        data: string,
+        perfil: Perfil,
+        private _hashtags: string[] = [],
+        private _visualizacoesRestantes: number
+    ) {
+        super(id, texto, curtidas, descurtidas, data, perfil);
     }
 
-    return false;
-  }
+    get hashtags(): string[] {
+        return this._hashtags;
+    }
 
-  existeHashtag(hashtag: string):boolean {
-    return this._hashtags.includes(hashtag);
-  }
+    get visualizacoesRestantes() {
+        return this._visualizacoesRestantes;
+    }
 
-  diminuirVisualizacoes() {
-    this._visualizacoesRestantes--;
-  }
+    adicionarHashtag(hashtag: string): void {
+        this.hashtags.push(hashtag);
+    }
 
-  podeSerExibida(): boolean {
-    return this._visualizacoesRestantes > 0;
-  }
+    existeHashtag(hashtag: string): boolean {
+        return this._hashtags.includes(hashtag);
+    }
+
+    diminuirVisualizacoes() {
+        this._visualizacoesRestantes--;
+    }
 }

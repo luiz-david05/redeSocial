@@ -1,3 +1,3 @@
-pa;0f835e56-bf45-46fe-9bdc-a26c2509f615;Duro como pedra!;100;20;06/11/2023;787521f6-632d-4624-91f0-209e1457f14e;#pedra;997
-p;72c81cb7-61a8-4376-bcd1-43b2c8ebe85a;bimbagoin;1500;5;06/11/2023;719fb0da-41c1-4faf-925d-90df8c4be196
-p;3ea30238-8afe-4468-9be6-e2fc1272a9cc;banana phone;0;0;06/11/2023;b4e26bdc-2306-4dc1-93c6-07f698875bd0
+pa;b36a880b-557e-4bce-be4f-8c0b6da2b7ed;i drive.;11;1;09/11/2023;1c7e454a-8fb1-4d56-b434-b50147c73e51;#drive;0
+pa;0db8aef1-7ccc-4026-bfd8-6e3d4b91f186;its my own summer;0;0;09/11/2023;1c7e454a-8fb1-4d56-b434-b50147c73e51;#deftones,#away;288
+p;ad131bdb-3f88-4271-9b80-d511c8f4efa8;debugando o c�digo;2;0;10/11/2023;1c7e454a-8fb1-4d56-b434-b50147c73e51

@@ -7,12 +7,13 @@ export class RepositorioDePerfis {
         this._perfis.push(perfil);
     }
     consultar(id, nome, email) {
-        for (let perfil of this._perfis) {
-            if ((id === null || perfil.id === id) &&
-                (nome === null || perfil.nome === nome) &&
-                (email === null || perfil.email === email)) {
+        for (const perfil of this._perfis) {
+            if (perfil.id == id)
                 return perfil;
-            }
+            else if (perfil.email == email)
+                return perfil;
+            else if (perfil.nome == nome)
+                return perfil;
         }
         return null;
     }
