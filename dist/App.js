@@ -290,6 +290,43 @@ class App {
             console.log("\nSem postagens para exibir, crie alguma(s)!");
         }
     }
+    excluirPerfil() {
+        const nomePerfil = utils.input("Nome do perfil: ");
+        if (nomePerfil == '') {
+            console.log("\nNome vazio ou inválido!");
+            return;
+        }
+        if (this._redeSocial.excluirPerfil(nomePerfil)) {
+            console.log("\nPerfil excluído com sucesso!");
+        }
+        else {
+            console.log("\nErro ao excluir perfil!");
+        }
+    }
+    excluirPostagem() {
+        const idPostagem = utils.input("Id da postagem: ");
+        if (idPostagem == '') {
+            console.log("\nId vazio ou inválido!");
+            return;
+        }
+        if (this._redeSocial.excluirPostagem(idPostagem)) {
+            console.log("\nPostagem excluída com sucesso!");
+        }
+        else {
+            console.log("\nErro ao excluir postagem!");
+        }
+    }
+    criarPerfilAleatorio() {
+        const perfil = this._redeSocial.criarPerfilAletorio();
+        if (this._redeSocial.incluirPerfil(perfil)) {
+            console.log("\nPerfil criado e inserido com sucesso!");
+            console.log("\nPerfil criado: ");
+            console.log(this._redeSocial.toStringPerfil(perfil));
+        }
+        else {
+            console.log("\nErro ao inserir o perfil!");
+        }
+    }
     menu() {
         console.log("\nOpções disponíveis: ");
         const texto = `\n\t1 - Criar perfil\n` +
@@ -303,6 +340,9 @@ class App {
             `\t9 - Exibir postagens populares (maior número\n\t    de curtidas em relação as descurtidas)\n` +
             `\t10 - Exibir hashtags populares\n` +
             `\t11 - Exibir feed de postagens\n` +
+            `\t12 - Excluir perfil\n` +
+            `\t13 - Excluir postagem\n` +
+            `\t14 - Criar perfil aleatório\n` +
             `\t0 - Sair`;
         console.log(texto);
     }
@@ -320,7 +360,7 @@ class App {
         catch (error) {
             console.log(error);
         }
-        const logo = "FACEBOQUE";
+        const logo = "INSIRA TEXTO";
         console.log("\t================================");
         console.log(`\t||         ${logo}         ||`);
         console.log("\t================================");
@@ -366,6 +406,15 @@ class App {
                     break;
                 case 11:
                     this.exibirFeedPostagens();
+                    break;
+                case 12:
+                    this.excluirPerfil();
+                    break;
+                case 13:
+                    this.excluirPostagem();
+                    break;
+                case 14:
+                    this.criarPerfilAleatorio();
                     break;
             }
         } while (opcao != 0);
