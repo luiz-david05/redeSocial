@@ -288,14 +288,15 @@ export class RedeSocial {
     excluirPostagem(id: string): boolean {
         const postagens = this.consultarPostagem(id, null, null, null);
 
-        postagens.forEach((postagem) => {
-            const index =
-                this._repositorioPostagens.postagens.indexOf(postagem);
-            this._repositorioPostagens.postagens.splice(index, 1);
-
+        if (postagens.length === 1) {
+            postagens.forEach((postagem) => {
+                const index =
+                    this._repositorioPostagens.postagens.indexOf(postagem);
+                this._repositorioPostagens.postagens.splice(index, 1);
+    
+            });
             return true;
-        });
-
+        }
         return false;
     }
 

@@ -1,3 +1,2 @@
 pa;b36a880b-557e-4bce-be4f-8c0b6da2b7ed;i drive.;11;1;09/11/2023;1c7e454a-8fb1-4d56-b434-b50147c73e51;#drive;0
-pa;0db8aef1-7ccc-4026-bfd8-6e3d4b91f186;its my own summer;0;0;09/11/2023;1c7e454a-8fb1-4d56-b434-b50147c73e51;#deftones,#away;288
-p;ad131bdb-3f88-4271-9b80-d511c8f4efa8;debugando o c�digo;2;0;10/11/2023;1c7e454a-8fb1-4d56-b434-b50147c73e51
+pa;0db8aef1-7ccc-4026-bfd8-6e3d4b91f186;its my own summer;0;0;09/11/2023;1c7e454a-8fb1-4d56-b434-b50147c73e51;#deftones,#away;284
