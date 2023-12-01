@@ -5,6 +5,7 @@ import { Postagem } from "./basicas/Postagem.js";
 import { PostagemAvancada } from "./basicas/PostagemAvancada.js";
 import chalk from "chalk";
 import * as utils from "./utils.js";
+import { PerfilJaExisteError } from "./erros/PerfilJaExisteError.js";
 
 export class RedeSocial {
     private _repositorioPerfis: RepositorioDePerfis = new RepositorioDePerfis();
@@ -18,51 +19,26 @@ export class RedeSocial {
     get repositorioPostagens() {
         return this._repositorioPostagens;
     }
-
-    private perfilEhValido(perfil: Perfil): boolean {
-        return (
-            perfil.id !== null && perfil.nome !== null && perfil.email !== null
-        );
-    }
-
-    incluirPerfil(perfil: Perfil): boolean {
-        if (
-            this.perfilEhValido(perfil) &&
-            this.consultarPerfil(perfil.id, perfil.nome, perfil.email) === null
-        ) {
-            this._repositorioPerfis.incluir(perfil);
-            return true;
-        }
-
-        return false;
-    }
-
+    
     consultarPerfil(id: string, nome: string, email: string): Perfil {
         return this._repositorioPerfis.consultar(id, nome, email);
     }
 
-    private postagemEhValida(postagem: Postagem): boolean {
-        if (
-            postagem.id !== null &&
-            postagem.texto !== null &&
-            postagem.curtidas !== null &&
-            postagem.descurtidas !== null &&
-            postagem.perfil !== null &&
-            postagem.data !== null
-        ) {
-            if (postagem instanceof PostagemAvancada) {
-                return (
-                    postagem.hashtags !== null &&
-                    postagem.visualizacoesRestantes !== null
-                );
+    incluirPerfil(perfil: Perfil): void {
+        try {
+            this.consultarPerfil(perfil.id, perfil.nome, perfil.email);
+            throw new PerfilJaExisteError('Perfil já existe!');
+        } catch (e: any) {
+            if (e instanceof PerfilJaExisteError) {
+                throw e;
+            } else {
+                this._repositorioPerfis.incluir(perfil);
             }
-            return true;
         }
-        return false;
     }
 
+
     incluirPostagem(postagem: Postagem): boolean {
-        if (this.postagemEhValida(postagem)) {
             if (
                 this.consultarPostagem(postagem.id, null, null, null).length ==
                 0
@@ -70,7 +46,6 @@ export class RedeSocial {
                 this._repositorioPostagens.incluir(postagem);
                 return true;
             }
-        }
 
         return false;
     }

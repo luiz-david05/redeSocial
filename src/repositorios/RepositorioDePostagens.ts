@@ -22,8 +22,8 @@ export class RepositorioDePostagens {
     ): Postagem[] {
         return this.postagens.filter(
             (postagem) =>
-                (id === null || postagem.id == id) &&
-                (texto === null || postagem.texto.indexOf(texto) != 1) &&
+                (postagem.id == id) &&
+                (postagem.texto.indexOf(texto) != 1) &&
                 (hashtag === null ||
                     (postagem instanceof PostagemAvancada &&
                         postagem.existeHashtag(hashtag))) &&

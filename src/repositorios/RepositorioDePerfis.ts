@@ -1,4 +1,5 @@
 import { Perfil } from "../basicas/Perfil.js";
+import { PerfilInexistenteErro } from "../erros/PerfilInexistenteErro.js";
 
 export class RepositorioDePerfis {
     private _perfis: Perfil[] = [];
@@ -18,6 +19,6 @@ export class RepositorioDePerfis {
             else if (perfil.nome == nome) return perfil;
         }
 
-        return null;
+        throw new PerfilInexistenteErro('Perfil não encontrado.')
     }
 }
